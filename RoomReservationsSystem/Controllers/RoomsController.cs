@@ -83,5 +83,16 @@ public class RoomsController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{id}")]
+    public IActionResult DeleteRoom(int id)
+    {
+        var roomToDelete = Rooms.FirstOrDefault(r => r.Id == id);
+
+        if (roomToDelete is null) return NotFound($"Nie znaleziono pokoju o id {id}");
+
+        Rooms.Remove(roomToDelete);
+
+        return Ok(Rooms);
+    }
    
 }
