@@ -59,5 +59,29 @@ public class RoomsController : ControllerBase
         return Ok(rooms);
     }
 
+    [HttpPost]
+    public IActionResult CreateRoom(Room room)
+    {
+        Rooms.Add(room);
+        return Ok(Rooms);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult UpdateRoom(int id, [FromBody] Room room)
+    {
+        var roomChanged = Rooms.FirstOrDefault(r => r.Id == id);
+
+        if (roomChanged is null) return NotFound($"Pokój o id {id} nie został odnaleziony");
+        
+        roomChanged.Name = room.Name;
+        roomChanged.BuildingCode = room.BuildingCode;
+        roomChanged.Capacity = room.Capacity;
+        roomChanged.Floor = room.Floor;
+        roomChanged.HasProjector = room.HasProjector;
+        roomChanged.IsActive = room.IsActive;
+
+        return NoContent();
+    }
+
    
 }
