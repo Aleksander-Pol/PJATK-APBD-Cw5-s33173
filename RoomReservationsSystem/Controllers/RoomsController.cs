@@ -34,9 +34,15 @@ public class RoomsController : ControllerBase
         
     
     [HttpGet]
-    public IActionResult GetRooms()
+    public IActionResult GetQueriedRoom([FromQuery] int? minCapacity,[FromQuery] bool? hasProjector,[FromQuery(Name = "activeOnly")] bool? isActive)
     {
-        return Ok(Rooms);
+        var rooms = Rooms.AsEnumerable();
+
+        if (minCapacity.HasValue) rooms = rooms.Where(r => r.Capacity >= minCapacity);
+        if (hasProjector.HasValue) rooms = rooms.Where(r => r.HasProjector == hasProjector);
+        if (isActive.HasValue) rooms = rooms.Where(r => r.IsActive == isActive);
+        
+        return Ok(rooms);
     }
 
     [HttpGet("{Id:int}")]
@@ -52,4 +58,6 @@ public class RoomsController : ControllerBase
         var rooms = Rooms.FindAll(r => r.BuildingCode.Equals(buildingCode));
         return Ok(rooms);
     }
+
+   
 }
