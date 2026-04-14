@@ -1,53 +1,100 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RoomReservationsSystem.Enums;
-using RoomReservationsSystem.Models;
+﻿    using Microsoft.AspNetCore.Mvc;
+    using RoomReservationsSystem.Enums;
+    using RoomReservationsSystem.Models;
 
-namespace RoomReservationsSystem.Controllers;
+    namespace RoomReservationsSystem.Controllers;
 
-[ApiController]
-[Route("api/reservations")]
-public class ReservationsController : ControllerBase
-{
-    public static List<Reservation> Reservations =
-    [
-        new Reservation()
-        {
-            Id = 1,
-            RoomId = 1,
-            OrganizerName = "Jan Długosz",
-            Topic = "Political and economical state" +
-                    "of the world",
-            Date = new DateOnly(2018, 12, 30),
-            StartTime = new TimeOnly(21,13),
-            EndTime = new TimeOnly(22, 28),
-            Status = Status.Confirmed
-        },
-        new Reservation()
-        {
-            Id = 1,
-            RoomId = 2,
-            OrganizerName = "Jan Bralczyk",
-            Topic = "The Fall of Constantinopole's Influence" +
-                    " on LeBron James' Legacy",
-            Date = new DateOnly(2019,3, 25),
-            StartTime = new TimeOnly(18,13),
-            EndTime = new TimeOnly(20, 23),
-            Status = Status.Confirmed
-        }
-    ];
-
-    [HttpGet]
-    public IActionResult GetQueriedReservation([FromQuery] string? date, [FromQuery] string? status,
-        [FromQuery] int? roomId)
+    [ApiController]
+    [Route("api/reservations")]
+    public class ReservationsController : ControllerBase
     {
-        var reservations = Reservations.AsEnumerable();
+        public static List<Reservation> Reservations =
+        [
+            new Reservation()
+            {
+                Id = 1,
+                RoomId = 1,
+                OrganizerName = "Jan Długosz",
+                Topic = "Political and economical state" +
+                        "of the world",
+                Date = new DateOnly(2018, 12, 30),
+                StartTime = new TimeOnly(21,13),
+                EndTime = new TimeOnly(22, 28),
+                Status = Status.Confirmed
+            },
+            new Reservation()
+            {
+                Id = 2,
+                RoomId = 2,
+                OrganizerName = "Jan Bralczyk",
+                Topic = "The Fall of Constantinopole's Influence" +
+                        " on LeBron James' Legacy",
+                Date = new DateOnly(2019,3, 25),
+                StartTime = new TimeOnly(18,13),
+                EndTime = new TimeOnly(20, 23),
+                Status = Status.Confirmed
+            }
+        ];
 
-        if (date is not null) reservations = reservations.Where(r => r.Date.ToString("yyyy-MM-dd").Equals(date));
-        if (status is not null)
-            reservations =
-                reservations.Where(r => r.Status.ToString().ToUpperInvariant().Equals(status.ToUpperInvariant()));
-        if (roomId.HasValue) reservations = reservations.Where(r => r.RoomId == roomId);
+        [HttpGet]
+        public IActionResult GetQueriedReservation([FromQuery] string? date, [FromQuery] string? status,
+            [FromQuery] int? roomId)
+        {
+            var reservations = Reservations.AsEnumerable();
 
-        return Ok(reservations);
+            if (date is not null) reservations = reservations.Where(r => r.Date.ToString("yyyy-MM-dd").Equals(date));
+            if (status is not null)
+                reservations =
+                    reservations.Where(r => r.Status.ToString().ToUpperInvariant().Equals(status.ToUpperInvariant()));
+            if (roomId.HasValue) reservations = reservations.Where(r => r.RoomId == roomId);
+
+            return Ok(reservations);
+        }
+
+        [HttpGet("{id:int}")]
+        public IActionResult GetReservationById(int id)
+        {
+            var reservation = Reservations.FirstOrDefault(r => r.Id == id);
+
+            return Ok(reservation);
+        }
+
+        [HttpPost]
+        public IActionResult CreateNewReservation(Reservation reservation)
+        {
+            Reservations.Add(reservation);
+
+            return Ok(Reservations);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateReservation(int id,[FromBody] Reservation reservation)
+        {
+            var newReservation = Reservations.FirstOrDefault(r => r.Id == id);
+
+            if (newReservation is null) return NotFound($"Rezerwacja o id {id} nie została odnaleziona");
+
+            newReservation.Id = reservation.Id;
+            newReservation.RoomId = reservation.RoomId;
+            newReservation.Date = reservation.Date;
+            newReservation.StartTime = reservation.StartTime;
+            newReservation.EndTime = reservation.EndTime;
+            newReservation.OrganizerName = reservation.OrganizerName;
+            newReservation.Topic = reservation.Topic;
+            newReservation.Status = reservation.Status;
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteRoom(int id)
+        {
+            var reservationToDelete = Reservations.FirstOrDefault(r => r.Id == id);
+
+            if (reservationToDelete is null) return NotFound($"Nie odnaleziono rezerwacji o id {id}");
+
+            Reservations.Remove(reservationToDelete);
+
+            return Ok(Reservations);
+        }
     }
-}
