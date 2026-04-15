@@ -16,6 +16,7 @@ public class Reservation
     public DateOnly Date{ get; set; }
     public TimeOnly StartTime { get; set; } 
     
+    [IsTimeAfter(nameof(StartTime))]
     public TimeOnly EndTime { get; set; }
     public Status Status { get; set; }
 }
