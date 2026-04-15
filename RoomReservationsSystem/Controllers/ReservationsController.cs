@@ -70,6 +70,15 @@
 
             if (!room.IsActive)
                 return BadRequest($"Nie można stworzyć rezerwacji na nieaktywny pokój");
+
+            bool isThereConflict = Reservations.Any(r =>
+                r.RoomId == reservation.RoomId &&
+                r.Date == reservation.Date &&
+                r.StartTime < reservation.EndTime &&
+                r.EndTime > reservation.StartTime);
+
+            if (isThereConflict)
+                return Conflict("Rezerwacja nakłada się czasowo z inną rezerwacją");
                 
             reservation.Id = Reservations.Count > 0 ? Reservations.Max(r => r.Id) + 1 : 1;
             Reservations.Add(reservation);
