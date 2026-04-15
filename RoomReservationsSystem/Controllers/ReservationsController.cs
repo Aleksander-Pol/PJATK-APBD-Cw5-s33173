@@ -42,7 +42,7 @@
         {
             var reservations = Reservations.AsEnumerable();
 
-            if (date is not null) reservations = reservations.Where(r => r.Date.ToString("yyyy-MM-dd").Equals(date));
+            if (date.HasValue) reservations = reservations.Where(r => r.Date == date.Value);
             if (status is not null)
                 reservations =
                     reservations.Where(r => r.Status == status);
@@ -56,6 +56,8 @@
         public IActionResult GetReservationById(int id)
         {
             var reservation = Reservations.FirstOrDefault(r => r.Id == id);
+
+            if (reservation is null) return NotFound($"Nie znaleziono rezerwacji o id = {id}");
 
             return Ok(reservation);
         }
@@ -93,6 +95,21 @@
 
             if (newReservation is null) return NotFound($"Rezerwacja o id {id} nie została odnaleziona");
 
+            var room = RoomsController.Rooms.FirstOrDefault(r => r.Id == reservation.RoomId);
+
+            if (room is null) return NotFound($"Nie znaleziono pokoju o id = {reservation.RoomId}");
+
+            if (!room.IsActive) return BadRequest($"Nie można przenieść rezerwacji do nieaktywnego pokoju");
+            
+            bool isThereConflict = Reservations.Any(r =>
+                r.Id != id &&
+                r.RoomId == reservation.RoomId &&
+                r.Date == reservation.Date &&
+                r.StartTime < reservation.EndTime &&
+                r.EndTime > reservation.StartTime);
+
+            if (isThereConflict) return Conflict("Godziny się nakładają z inną rezerwacją");
+
             newReservation.Id = reservation.Id;
             newReservation.RoomId = reservation.RoomId;
             newReservation.Date = reservation.Date;
@@ -106,7 +123,7 @@
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteRoom(int id)
+        public IActionResult DeleteReservation(int id)
         {
             var reservationToDelete = Reservations.FirstOrDefault(r => r.Id == id);
 
@@ -114,6 +131,6 @@
 
             Reservations.Remove(reservationToDelete);
 
-            return Ok(Reservations);
+            return NoContent();
         }
     }
