@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.InteropServices.JavaScript;
 using Microsoft.AspNetCore.Mvc;
 using RoomReservationsSystem.Models;
 
@@ -49,6 +50,10 @@ public class RoomsController : ControllerBase
     public IActionResult GetRoomById(int id)
     {
         var room = Rooms.FirstOrDefault(r => r.Id == id);
+
+        if (room is null)
+            return NotFound($"Nie znaleziono pokoju o Id = {id}");
+        
         return Ok(room);
     }
 
@@ -62,8 +67,9 @@ public class RoomsController : ControllerBase
     [HttpPost]
     public IActionResult CreateRoom(Room room)
     {
+        room.Id = Rooms.Count > 0 ? Rooms.Max(r => r.Id) + 1 : 1;
         Rooms.Add(room);
-        return Ok(Rooms);
+        return CreatedAtAction(nameof(GetRoomById), new {id = room.Id}, room);
     }
 
     [HttpPut("{id}")]
@@ -89,10 +95,17 @@ public class RoomsController : ControllerBase
         var roomToDelete = Rooms.FirstOrDefault(r => r.Id == id);
 
         if (roomToDelete is null) return NotFound($"Nie znaleziono pokoju o id {id}");
+        
+        bool areThereFutureReservations = ReservationsController.Reservations.Any(r =>
+            r.RoomId == id &&
+            r.Date > DateOnly.FromDateTime(DateTime.Now));
 
+        if (areThereFutureReservations)
+            return Conflict("Nie można usunąć tego pokoju ponieważ posiada on rezerwacje w przyszłości");
+        
         Rooms.Remove(roomToDelete);
 
-        return Ok(Rooms);
+        return NoContent();
     }
    
 }
