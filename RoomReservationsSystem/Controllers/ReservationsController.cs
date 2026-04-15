@@ -37,7 +37,7 @@
         ];
 
         [HttpGet]
-        public IActionResult GetQueriedReservation([FromQuery] string? date, [FromQuery] string? status,
+        public IActionResult GetQueriedReservation([FromQuery] DateOnly? date, [FromQuery] Status? status,
             [FromQuery] int? roomId)
         {
             var reservations = Reservations.AsEnumerable();
@@ -45,7 +45,8 @@
             if (date is not null) reservations = reservations.Where(r => r.Date.ToString("yyyy-MM-dd").Equals(date));
             if (status is not null)
                 reservations =
-                    reservations.Where(r => r.Status.ToString().ToUpperInvariant().Equals(status.ToUpperInvariant()));
+                    reservations.Where(r => r.Status == status);
+            
             if (roomId.HasValue) reservations = reservations.Where(r => r.RoomId == roomId);
 
             return Ok(reservations);
@@ -62,9 +63,18 @@
         [HttpPost]
         public IActionResult CreateNewReservation(Reservation reservation)
         {
+            var room = RoomsController.Rooms.FirstOrDefault(r => r.Id == reservation.RoomId);
+
+            if (room is null)
+                return NotFound($"Nie znaleziono pokoju o id {reservation.RoomId}");
+
+            if (!room.IsActive)
+                return BadRequest($"Nie można stworzyć rezerwacji na nieaktywny pokój");
+                
+            reservation.Id = Reservations.Count > 0 ? Reservations.Max(r => r.Id) + 1 : 1;
             Reservations.Add(reservation);
 
-            return Ok(Reservations);
+            return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, reservation);
         }
 
         [HttpPut("{id}")]
