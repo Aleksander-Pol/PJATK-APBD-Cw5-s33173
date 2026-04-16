@@ -102,7 +102,7 @@ public class RoomsController : ControllerBase
         return CreatedAtAction(nameof(GetRoomById), new {id = room.Id}, room);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public IActionResult UpdateRoom(int id, [FromBody] Room room)
     {
         var roomChanged = Rooms.FirstOrDefault(r => r.Id == id);
@@ -119,7 +119,7 @@ public class RoomsController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public IActionResult DeleteRoom(int id)
     {
         var roomToDelete = Rooms.FirstOrDefault(r => r.Id == id);

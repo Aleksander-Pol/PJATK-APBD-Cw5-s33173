@@ -121,7 +121,7 @@
             return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, reservation);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public IActionResult UpdateReservation(int id,[FromBody] Reservation reservation)
         {
             var newReservation = Reservations.FirstOrDefault(r => r.Id == id);
@@ -155,7 +155,7 @@
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public IActionResult DeleteReservation(int id)
         {
             var reservationToDelete = Reservations.FirstOrDefault(r => r.Id == id);
