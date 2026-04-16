@@ -30,6 +30,36 @@ public class RoomsController : ControllerBase
             Floor = 7,
             HasProjector = false,
             IsActive = true
+        },
+        new Room()
+        {
+            Id = 3,
+            Name = "Bajo jajo",
+            BuildingCode = "36b",
+            Capacity = 15,
+            Floor = 10,
+            HasProjector = false,
+            IsActive = false
+        },
+        new Room()
+        {
+            Id = 4,
+            Name = "Swamp",
+            BuildingCode = "29a",
+            Capacity = 50,
+            Floor = 4,
+            HasProjector = true,
+            IsActive = true
+        },
+        new Room()
+        {
+            Id = 5, 
+            Name = "Tux island",
+            BuildingCode = "16b",
+            Capacity = 10,
+            Floor = 2,
+            HasProjector = false,
+            IsActive = true
         }
     ];
         

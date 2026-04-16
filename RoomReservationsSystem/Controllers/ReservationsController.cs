@@ -33,6 +33,39 @@
                 StartTime = new TimeOnly(18,13),
                 EndTime = new TimeOnly(20, 23),
                 Status = Status.Confirmed
+            },
+            new Reservation()
+            {
+                Id = 3,
+                RoomId = 3,
+                OrganizerName = "J.K. Rowling",
+                Topic = "Re-inventing Harry Potter plot through social media",
+                Date = new DateOnly(2026, 6, 6),
+                StartTime = new TimeOnly(18, 00),
+                EndTime = new TimeOnly(19,00),
+                Status = Status.Planned
+            },
+            new Reservation()
+            {
+                Id = 4,
+                RoomId = 4,
+                OrganizerName = "Ted Kaczynski",
+                Topic = "Is advancement in technology a real danger to society",
+                Date = new DateOnly(2022, 7,17),
+                StartTime = new TimeOnly(10,15),
+                EndTime = new TimeOnly(11,45),
+                Status = Status.Cancelled
+            },
+            new Reservation()
+            {
+                Id = 5, 
+                RoomId = 5,
+                OrganizerName = "Andrzej Dragan",
+                Topic = "Is AI only a mathematical function",
+                Date = new DateOnly(2023,1,1),
+                StartTime = new TimeOnly(15,00),
+                EndTime = new TimeOnly(18,00),
+                Status = Status.Confirmed
             }
         ];
 
